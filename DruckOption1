@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Druckoption - T-Shirt & Hoodie Designer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Oswald:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .product-canvas {
+            position: relative;
+            width: 350px;
+            height: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .product-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            overflow: hidden;
+            background-color: transparent;
+        }
+        .design-text {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            padding: 5px;
+            border: 2px dashed transparent;
+            z-index: 10;
+        }
+        .design-text.active {
+            border: 2px dashed #3b82f6;
+        }
+        .design-image {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            max-width: 150px;
+            max-height: 150px;
+            border: 2px dashed transparent;
+            z-index: 10;
+        }
+        .design-image.active {
+            border: 2px dashed #3b82f6;
+        }
+        .font-roboto { font-family: 'Roboto', sans-serif; }
+        .font-opensans { font-family: 'Open Sans', sans-serif; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-lato { font-family: 'Lato', sans-serif; }
+        .font-oswald { font-family: 'Oswald', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-dancing { font-family: 'Dancing Script', cursive; }
+        
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 0 5px;
+            border: 2px solid #e5e7eb;
+            transition: transform 0.2s;
+        }
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        .color-swatch.active {
+            border: 2px solid #3b82f6;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .product-type-btn {
+            transition: all 0.3s;
+        }
+        .product-type-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Druckoption</h1>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:underline">Startseite</a></li>
+                        <li><a href="#designer" class="hover:underline">Designer</a></li>
+                        <li><a href="#about" class="hover:underline">Über uns</a></li>
+                        <li><a href="#contact" class="hover:underline">Kontakt</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4">Gestalte dein eigenes Design</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Willkommen bei Druckoption! Hier kannst du deine eigenen T-Shirts und Hoodies gestalten.
+                Wähle dein Produkt, die Farbe und füge Text oder Bilder hinzu. Gestalte dein perfektes Kleidungsstück
+                und bestelle es direkt online.
+            </p>
+        </section>
+
+        <section id="designer" class="bg-white rounded-lg shadow-lg p-6 mb-12">
+            <div class="flex flex-col lg:flex-row">
+                <!-- Linke Seite - Produktvorschau -->
+                <div class="w-full lg:w-1/2 mb-8 lg:mb-0">
+                    <div class="flex justify-center mb-4">
+                        <button id="btnFront" class="tab active">Vorderseite</button>
+                        <button id="btnBack" class="tab">Rückseite</button>
+                    </div>
+                    
+                    <div class="product-canvas bg-gray-100 rounded-lg" id="designCanvas">
+                        <!-- Produktbild wird hier als iframe angezeigt -->
+                        <iframe id="productImage" class="product-iframe" src="https://drive.google.com/file/d/1t5627Fsl8b8qfyFpPhd1LyEWB5MTq4FE/preview" allowfullscreen></iframe>
+                        <div id="designElements"></div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-500">Klicke und ziehe Elemente, um sie zu positionieren</p>
+                    </div>
+                </div>
+                
+                <!-- Rechte Seite - Designoptionen -->
+                <div class="w-full lg:w-1/2 lg:pl-8">
+                    <h3 class="text-2xl font-bold mb-4">Gestalte dein Produkt</h3>
+                    
+                    <!-- Produkttyp -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-2">Produkttyp</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btnTshirt" class="product-type-btn active px-4 py-2 border rounded-md">T-Shirt</button>
+                            <button id="btnHoodie" class="product-type-btn px-4 py-2 border rounded-md">Hoodie</button>
+                            <button id="btnBasketball" class="product-type-btn px-4 py-2 border rounded-md">Basketball Trikot</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Farbauswahl -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-2">Farbe</h4>
+                        <div id="colorSwatches" class="flex flex-wrap gap-2">
+                            <!-- T-Shirt und Hoodie Farben -->
+                            <div class="color-swatch active tshirt-color hoodie-color" style="background-color: #000000;" data-color="black" title="Schwarz"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #808080;" data-color="gray" title="Grau"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #ffffff;" data-color="white" title="Weiß"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #00008B;" data-color="darkblue" title="Dunkelblau"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #8B4513;" data-color="brown" title="Braun"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #F5F5DC;" data-color="beige" title="Beige"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #008000;" data-color="green" title="Grün"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #FF69B4;" data-color="pink" title="Pink"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #8B0000;" data-color="darkred" title="Dunkelrot"></div>
+                            <div class="color-swatch tshirt-color hoodie-color" style="background-color: #ADD8E6;" data-color="lightblue" title="Hellblau"></div>
+                            
+                            <!-- Basketball Trikot Farben -->
+                            <div class="color-swatch basketball-color" style="background-color: #000000; display: none;" data-color="black" title="Schwarz"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #006400; display: none;" data-color="darkgreen" title="Dunkelgrün"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #000080; display: none;" data-color="navy" title="Navy"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #FF0000; display: none;" data-color="red" title="Rot"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #87CEEB; display: none;" data-color="lightblue" title="Hellblau"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #FFFF00; display: none;" data-color="yellow" title="Gelb"></div>
+                            <div class="color-swatch basketball-color" style="background-color: #ffffff; display: none;" data-color="white" title="Weiß"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text hinzufügen -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-2">Text hinzufügen</h4>
+                        <div class="flex flex-col space-y-3">
+                            <input type="text" id="textInput" placeholder="Dein Text hier..." class="px-4 py-2 border rounded-md">
+                            
+                            <div class="flex flex-wrap gap-2">
+                                <select id="fontSelect" class="px-4 py-2 border rounded-md">
+                                    <option value="font-roboto">Roboto</option>
+                                    <option value="font-opensans">Open Sans</option>
+                                    <option value="font-montserrat">Montserrat</option>
+                                    <option value="font-lato">Lato</option>
+                                    <option value="font-oswald">Oswald</option>
+                                    <option value="font-playfair">Playfair Display</option>
+                                    <option value="font-dancing">Dancing Script</option>
+                                </select>
+                                
+                                <select id="fontSizeSelect" class="px-4 py-2 border rounded-md">
+                                    <option value="text-sm">Klein</option>
+                                    <option value="text-base" selected>Normal</option>
+                                    <option value="text-lg">Groß</option>
+                                    <option value="text-xl">Sehr groß</option>
+                                    <option value="text-2xl">Extra groß</option>
+                                </select>
+                                
+                                <select id="fontWeightSelect" class="px-4 py-2 border rounded-md">
+                                    <option value="font-normal" selected>Normal</option>
+                                    <option value="font-medium">Medium</option>
+                                    <option value="font-semibold">Halbfett</option>
+                                    <option value="font-bold">Fett</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2">
+                                <input type="color" id="textColorInput" value="#000000" class="w-12 h-10 border rounded-md">
+                                <button id="addTextBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Text hinzufügen</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bild hochladen -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-2">Bild hochladen</h4>
+                        <div class="flex flex-col space-y-3">
+                            <input type="file" id="imageUpload" accept="image/*" class="w-full">
+                        </div>
+                    </div>
+                    
+                    <!-- Element löschen -->
+                    <div class="mb-6">
+                        <button id="deleteElementBtn" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:bg-gray-400" disabled>Ausgewähltes Element löschen</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bestellbereich -->
+            <div class="mt-8 pt-8 border-t">
+                <h3 class="text-2xl font-bold mb-4">Deine Bestellung</h3>
+                
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div class="flex flex-col md:flex-row justify-between">
+                        <div>
+                            <h4 class="font-semibold" id="orderProductType">T-Shirt mit Design</h4>
+                            <p class="text-gray-600" id="orderProductColor">Farbe: Schwarz</p>
+                        </div>
+                        
+                        <div class="mt-4 md:mt-0">
+                            <label for="quantity" class="block text-sm font-medium text-gray-700">Menge:</label>
+                            <select id="quantity" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="1">1</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <p class="text-lg"><span class="font-semibold">Einzelpreis:</span> <span id="unitPrice">19.99 €</span></p>
+                        <p class="text-lg"><span class="font-semibold">Versand:</span> 5.99 € (Deutschland)</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <p class="text-xl font-bold">Gesamtpreis: <span id="totalPrice">25.98 €</span></p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div id="paypal-button-container" class="mb-4"></div>
+                    <button id="orderBtn" class="bg-green-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-green-700">Jetzt bestellen</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="about" class="bg-white rounded-lg shadow-lg p-6 mb-12">
+            <h2 class="text-3xl font-bold mb-6">Über Druckoption</h2>
+            <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-2/3 pr-0 md:pr-8">
+                    <p class="mb-4">
+                        Druckoption ist dein Spezialist für individuell gestaltete T-Shirts und Hoodies. Wir bieten dir die Möglichkeit, 
+                        deine eigenen Designs zu erstellen und auf hochwertige Kleidungsstücke drucken zu lassen.
+                    </p>
+                    <p class="mb-4">
+                        Unser Online-Designer macht es dir leicht, deine Ideen umzusetzen. Wähle aus verschiedenen Farben, 
+                        füge Text in unterschiedlichen Schriftarten hinzu oder lade deine eigenen Bilder hoch.
+                    </p>
+                    <p class="mb-4">
+                        Egal ob für dein Team, deinen Verein, deine Familie oder einfach für dich selbst - 
+                        mit Druckoption bekommst du qualitativ hochwertige Produkte zu fairen Preisen.
+                    </p>
+                    <h3 class="text-xl font-bold mt-6 mb-3">Unsere Preise</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">Produkt</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-right">1 Stück</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-right">ab 10 Stück</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-right">ab 25 Stück</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-right">ab 100 Stück</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-2 px-4 border-b border-gray-200">T-Shirt mit Design</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">19.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">18.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">17.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">16.99 €</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b border-gray-200">Hoodie mit Design</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">44.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">42.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">41.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">39.99 €</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b border-gray-200">Basketball Trikot mit Design</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">34.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">32.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">31.99 €</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right">29.99 €</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b border-gray-200">Versand (Deutschland)</td>
+                                    <td class="py-2 px-4 border-b border-gray-200 text-right" colspan="4">5.99 €</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 mt-6 md:mt-0">
+                    <div class="bg-gray-100 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold mb-4">So funktioniert's</h3>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>Wähle dein Produkt (T-Shirt, Hoodie oder Basketball Trikot)</li>
+                            <li>Wähle die gewünschte Farbe</li>
+                            <li>Füge Text hinzu und gestalte ihn nach deinen Wünschen</li>
+                            <li>Lade eigene Bilder hoch (optional)</li>
+                            <li>Positioniere alle Elemente durch Ziehen mit der Maus</li>
+                            <li>Wähle die gewünschte Menge</li>
+                            <li>Bestelle dein individuelles Produkt</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-3xl font-bold mb-6">Kontakt</h2>
+            <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 pr-0 md:pr-8 mb-6 md:mb-0">
+                    <p class="mb-4">
+                        Hast du Fragen zu unseren Produkten oder benötigst du Hilfe bei deiner Bestellung?
+                        Kontaktiere uns gerne - wir helfen dir weiter!
+                    </p>
+                    <div class="space-y-2">
+                        <p><strong>E-Mail:</strong> druckoption@outlook.de</p>
+                        <p><strong>Telefon:</strong> 01637166292</p>
+                        <p><strong>Öffnungszeiten:</strong> Mo-Fr 9:00 - 17:00 Uhr</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <form id="contactForm" action="https://formspree.io/f/xzzgjdbe" method="POST" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full px-4 py-2 border rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">E-Mail</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full px-4 py-2 border rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700">Nachricht</label>
+                            <textarea id="message" name="message" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md" required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" id="contactBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Nachricht senden</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-xl font-bold mb-4">Druckoption</h3>
+                    <p>Dein Spezialist für individuell gestaltete Kleidung</p>
+                </div>
+                <div class="mb-6 md:mb-0">
+                    <h4 class="font-semibold mb-3">Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline">Startseite</a></li>
+                        <li><a href="#designer" class="hover:underline">Designer</a></li>
+                        <li><a href="#about" class="hover:underline">Über uns</a></li>
+                        <li><a href="#contact" class="hover:underline">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Rechtliches</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline">Impressum</a></li>
+                        <li><a href="#" class="hover:underline">Datenschutz</a></li>
+                        <li><a href="#" class="hover:underline">AGB</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-700 text-center">
+                <p>&copy; 2025 Druckoption made with love</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=EUR"></script>
+
+    <script>
+        // Bildpfade für T-Shirts, Hoodies und Basketball Trikots
+        const productImages = {
+            tshirt: {
+                front: {
+                    black: "https://drive.google.com/file/d/1t5627Fsl8b8qfyFpPhd1LyEWB5MTq4FE/preview",
+                    gray: "https://drive.google.com/file/d/1t6LtgsUPq_AuYZ-7Akj3pNEGK5spvUcG/preview",
+                    white: "https://drive.google.com/file/d/1pjaGo1MK90hBX2WAohJtl9CASPFxpgJw/preview",
+                    darkblue: "HIER_TSHIRT_FRONT_DARKBLUE_BILD_URL_EINFÜGEN",
+                    brown: "HIER_TSHIRT_FRONT_BROWN_BILD_URL_EINFÜGEN",
+                    beige: "HIER_TSHIRT_FRONT_BEIGE_BILD_URL_EINFÜGEN",
+                    green: "HIER_TSHIRT_FRONT_GREEN_BILD_URL_EINFÜGEN",
+                    pink: "HIER_TSHIRT_FRONT_PINK_BILD_URL_EINFÜGEN",
+                    darkred: "HIER_TSHIRT_FRONT_DARKRED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_TSHIRT_FRONT_LIGHTBLUE_BILD_URL_EINFÜGEN"
+                },
+                back: {
+                    black: "https://drive.google.com/file/d/1dhhFFjbzm-gouixpsONsk7eATtxM1gGA/preview",
+                    gray: "https://drive.google.com/file/d/1COovdSn5pXtELABQKYWOct4LU9cP7aGY/preview",
+                    white: "https://drive.google.com/file/d/1BTjsvbHEAltBlA8nFcxV45cGnpIlaGMs/preview",
+                    darkblue: "HIER_TSHIRT_BACK_DARKBLUE_BILD_URL_EINFÜGEN",
+                    brown: "HIER_TSHIRT_BACK_BROWN_BILD_URL_EINFÜGEN",
+                    beige: "HIER_TSHIRT_BACK_BEIGE_BILD_URL_EINFÜGEN",
+                    green: "HIER_TSHIRT_BACK_GREEN_BILD_URL_EINFÜGEN",
+                    pink: "HIER_TSHIRT_BACK_PINK_BILD_URL_EINFÜGEN",
+                    darkred: "HIER_TSHIRT_BACK_DARKRED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_TSHIRT_BACK_LIGHTBLUE_BILD_URL_EINFÜGEN"
+                }
+            },
+            hoodie: {
+                front: {
+                    black: "HIER_HOODIE_FRONT_BLACK_BILD_URL_EINFÜGEN",
+                    gray: "HIER_HOODIE_FRONT_GRAY_BILD_URL_EINFÜGEN",
+                    white: "HIER_HOODIE_FRONT_WHITE_BILD_URL_EINFÜGEN",
+                    darkblue: "HIER_HOODIE_FRONT_DARKBLUE_BILD_URL_EINFÜGEN",
+                    brown: "HIER_HOODIE_FRONT_BROWN_BILD_URL_EINFÜGEN",
+                    beige: "HIER_HOODIE_FRONT_BEIGE_BILD_URL_EINFÜGEN",
+                    green: "HIER_HOODIE_FRONT_GREEN_BILD_URL_EINFÜGEN",
+                    pink: "HIER_HOODIE_FRONT_PINK_BILD_URL_EINFÜGEN",
+                    darkred: "HIER_HOODIE_FRONT_DARKRED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_HOODIE_FRONT_LIGHTBLUE_BILD_URL_EINFÜGEN"
+                },
+                back: {
+                    black: "HIER_HOODIE_BACK_BLACK_BILD_URL_EINFÜGEN",
+                    gray: "HIER_HOODIE_BACK_GRAY_BILD_URL_EINFÜGEN",
+                    white: "HIER_HOODIE_BACK_WHITE_BILD_URL_EINFÜGEN",
+                    darkblue: "HIER_HOODIE_BACK_DARKBLUE_BILD_URL_EINFÜGEN",
+                    brown: "HIER_HOODIE_BACK_BROWN_BILD_URL_EINFÜGEN",
+                    beige: "HIER_HOODIE_BACK_BEIGE_BILD_URL_EINFÜGEN",
+                    green: "HIER_HOODIE_BACK_GREEN_BILD_URL_EINFÜGEN",
+                    pink: "HIER_HOODIE_BACK_PINK_BILD_URL_EINFÜGEN",
+                    darkred: "HIER_HOODIE_BACK_DARKRED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_HOODIE_BACK_LIGHTBLUE_BILD_URL_EINFÜGEN"
+                }
+            },
+            basketball: {
+                front: {
+                    black: "HIER_BASKETBALL_FRONT_BLACK_BILD_URL_EINFÜGEN",
+                    darkgreen: "HIER_BASKETBALL_FRONT_DARKGREEN_BILD_URL_EINFÜGEN",
+                    navy: "HIER_BASKETBALL_FRONT_NAVY_BILD_URL_EINFÜGEN",
+                    red: "HIER_BASKETBALL_FRONT_RED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_BASKETBALL_FRONT_LIGHTBLUE_BILD_URL_EINFÜGEN",
+                    yellow: "HIER_BASKETBALL_FRONT_YELLOW_BILD_URL_EINFÜGEN",
+                    white: "HIER_BASKETBALL_FRONT_WHITE_BILD_URL_EINFÜGEN"
+                },
+                back: {
+                    black: "HIER_BASKETBALL_BACK_BLACK_BILD_URL_EINFÜGEN",
+                    darkgreen: "HIER_BASKETBALL_BACK_DARKGREEN_BILD_URL_EINFÜGEN",
+                    navy: "HIER_BASKETBALL_BACK_NAVY_BILD_URL_EINFÜGEN",
+                    red: "HIER_BASKETBALL_BACK_RED_BILD_URL_EINFÜGEN",
+                    lightblue: "HIER_BASKETBALL_BACK_LIGHTBLUE_BILD_URL_EINFÜGEN",
+                    yellow: "HIER_BASKETBALL_BACK_YELLOW_BILD_URL_EINFÜGEN",
+                    white: "HIER_BASKETBALL_BACK_WHITE_BILD_URL_EINFÜGEN"
+                }
+            }
+        };
+
+        // Standardwerte
+        let currentProductType = 'tshirt';
+        let currentSide = 'front';
+        let currentColor = 'black';
+        let activeElement = null;
+        let designElements = [];
+        let elementCounter = 0;
+
+        // DOM-Elemente
+        const productImage = document.getElementById('productImage');
+        const designCanvas = document.getElementById('designCanvas');
+        const designElementsContainer = document.getElementById('designElements');
+        const btnFront = document.getElementById('btnFront');
+        const btnBack = document.getElementById('btnBack');
+        const btnTshirt = document.getElementById('btnTshirt');
+        const btnHoodie = document.getElementById('btnHoodie');
+        const btnBasketball = document.getElementById('btnBasketball');
+        const colorSwatches = document.querySelectorAll('.color-swatch');
+        const textInput = document.getElementById('textInput');
+        const fontSelect = document.getElementById('fontSelect');
+        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        const fontWeightSelect = document.getElementById('fontWeightSelect');
+        const textColorInput = document.getElementById('textColorInput');
+        const addTextBtn = document.getElementById('addTextBtn');
+        const imageUpload = document.getElementById('imageUpload');
+        const deleteElementBtn = document.getElementById('deleteElementBtn');
+        const orderProductType = document.getElementById('orderProductType');
+        const orderProductColor = document.getElementById('orderProductColor');
+        const quantitySelect = document.getElementById('quantity');
+        const unitPriceElement = document.getElementById('unitPrice');
+        const totalPriceElement = document.getElementById('totalPrice');
+        const orderBtn = document.getElementById('orderBtn');
+
+        // Funktion zum Anzeigen der richtigen Farbauswahl
+        function showColorsForProductType() {
+            const tshirtColors = document.querySelectorAll('.tshirt-color');
+            const hoodieColors = document.querySelectorAll('.hoodie-color');
+            const basketballColors = document.querySelectorAll('.basketball-color');
+            
+            // Alle Farben verstecken
+            tshirtColors.forEach(color => color.style.display = 'none');
+            hoodieColors.forEach(color => color.style.display = 'none');
+            basketballColors.forEach(color => color.style.display = 'none');
+            
+            // Richtige Farben anzeigen
+            if (currentProductType === 'tshirt') {
+                tshirtColors.forEach(color => color.style.display = 'block');
+            } else if (currentProductType === 'hoodie') {
+                hoodieColors.forEach(color => color.style.display = 'block');
+            } else if (currentProductType === 'basketball') {
+                basketballColors.forEach(color => color.style.display = 'block');
+                // Erste verfügbare Farbe für Basketball auswählen
+                if (!basketballColors[0].classList.contains('active')) {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    basketballColors[0].classList.add('active');
+                    currentColor = basketballColors[0].getAttribute('data-color');
+                }
+            }
+        }
+
+        // Funktion zum Aktualisieren des Produktbildes
+        function updateProductImage() {
+            const imagePath = productImages[currentProductType][currentSide][currentColor];
+            productImage.src = imagePath;
+            
+            // Aktualisiere Bestellinformationen
+            let productName = '';
+            if (currentProductType === 'tshirt') {
+                productName = 'T-Shirt mit Design';
+            } else if (currentProductType === 'hoodie') {
+                productName = 'Hoodie mit Design';
+            } else if (currentProductType === 'basketball') {
+                productName = 'Basketball Trikot mit Design';
+            }
+            
+            orderProductType.textContent = productName;
+            orderProductColor.textContent = `Farbe: ${getColorName(currentColor)}`;
+            
+            // Aktualisiere Preis
+            updatePrice();
+        }
+
+        // Funktion zum Abrufen des Farbnamens
+        function getColorName(color) {
+            const colorNames = {
+                'black': 'Schwarz',
+                'gray': 'Grau',
+                'white': 'Weiß',
+                'darkblue': 'Dunkelblau',
+                'brown': 'Braun',
+                'beige': 'Beige',
+                'green': 'Grün',
+                'pink': 'Pink',
+                'darkred': 'Dunkelrot',
+                'lightblue': 'Hellblau',
+                'darkgreen': 'Dunkelgrün',
+                'navy': 'Navy',
+                'red': 'Rot',
+                'yellow': 'Gelb'
+            };
+            return colorNames[color] || color;
+        }
+
+        // Funktion zum Aktualisieren des Preises
+        function updatePrice() {
+            const quantity = parseInt(quantitySelect.value);
+            let unitPrice;
+            
+            // Grundpreise je nach Produkttyp
+            if (currentProductType === 'tshirt') {
+                unitPrice = 19.99;
+            } else if (currentProductType === 'hoodie') {
+                unitPrice = 44.99;
+            } else if (currentProductType === 'basketball') {
+                unitPrice = 34.99;
+            }
+            
+            // Mengenrabatt
+            if (quantity >= 100) {
+                if (currentProductType === 'tshirt') {
+                    unitPrice = 16.99;
+                } else if (currentProductType === 'hoodie') {
+                    unitPrice = 39.99;
+                } else if (currentProductType === 'basketball') {
+                    unitPrice = 29.99;
+                }
+            } else if (quantity >= 25) {
+                if (currentProductType === 'tshirt') {
+                    unitPrice = 17.99;
+                } else if (currentProductType === 'hoodie') {
+                    unitPrice = 41.99;
+                } else if (currentProductType === 'basketball') {
+                    unitPrice = 31.99;
+                }
+            } else if (quantity >= 10) {
+                if (currentProductType === 'tshirt') {
+                    unitPrice = 18.99;
+                } else if (currentProductType === 'hoodie') {
+                    unitPrice = 42.99;
+                } else if (currentProductType === 'basketball') {
+                    unitPrice = 32.99;
+                }
+            }
+            
+            const shippingCost = 5.99;
+            const totalPrice = (unitPrice * quantity) + shippingCost;
+            
+            unitPriceElement.textContent = `${unitPrice.toFixed(2)} €`;
+            totalPriceElement.textContent = `${totalPrice.toFixed(2)} €`;
+        }
+
+        // Funktion zum Hinzufügen eines Textelements
+        function addTextElement() {
+            const text = textInput.value.trim();
+            if (!text) return;
+            
+            const fontFamily = fontSelect.value;
+            const fontSize = fontSizeSelect.value;
+            const fontWeight = fontWeightSelect.value;
+            const textColor = textColorInput.value;
+            
+            const textElement = document.createElement('div');
+            textElement.id = `element-${elementCounter++}`;
+            textElement.className = `design-text ${fontFamily} ${fontSize} ${fontWeight}`;
+            textElement.textContent = text;
+            textElement.style.color = textColor;
+            textElement.style.left = '50%';
+            textElement.style.top = '50%';
+            textElement.style.transform = 'translate(-50%, -50%)';
+            
+            designElementsContainer.appendChild(textElement);
+            
+            // Element in die Liste aufnehmen
+            designElements.push({
+                id: textElement.id,
+                type: 'text',
+                element: textElement,
+                side: currentSide
+            });
+            
+            // Event-Listener für Drag & Drop
+            makeElementDraggable(textElement);
+            
+            // Element auswählen
+            selectElement(textElement);
+            
+            // Textfeld zurücksetzen
+            textInput.value = '';
+        }
+
+        // Funktion zum Hinzufügen eines Bildelements
+        function addImageElement(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const imageElement = document.createElement('img');
+                imageElement.id = `element-${elementCounter++}`;
+                imageElement.className = 'design-image';
+                imageElement.src = e.target.result;
+                imageElement.style.left = '50%';
+                imageElement.style.top = '50%';
+                imageElement.style.transform = 'translate(-50%, -50%)';
+                
+                designElementsContainer.appendChild(imageElement);
+                
+                // Element in die Liste aufnehmen
+                designElements.push({
+                    id: imageElement.id,
+                    type: 'image',
+                    element: imageElement,
+                    side: currentSide
+                });
+                
+                // Event-Listener für Drag & Drop
+                makeElementDraggable(imageElement);
+                
+                // Element auswählen
+                selectElement(imageElement);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Funktion zum Auswählen eines Elements
+        function selectElement(element) {
+            // Vorheriges aktives Element deaktivieren
+            if (activeElement) {
+                activeElement.classList.remove('active');
+            }
+            
+            // Neues Element aktivieren
+            activeElement = element;
+            activeElement.classList.add('active');
+            
+            // Löschbutton aktivieren
+            deleteElementBtn.disabled = false;
+        }
+
+        // Funktion zum Löschen des ausgewählten Elements
+        function deleteSelectedElement() {
+            if (!activeElement) return;
+            
+            // Element aus dem DOM entfernen
+            activeElement.remove();
+            
+            // Element aus der Liste entfernen
+            designElements = designElements.filter(item => item.id !== activeElement.id);
+            
+            // Aktives Element zurücksetzen
+            activeElement = null;
+            
+            // Löschbutton deaktivieren
+            deleteElementBtn.disabled = true;
+        }
+
+        // Funktion zum Anzeigen der Elemente für die aktuelle Seite
+        function showElementsForCurrentSide() {
+            designElements.forEach(item => {
+                if (item.side === currentSide) {
+                    item.element.style.display = 'block';
+                } else {
+                    item.element.style.display = 'none';
+                }
+            });
+        }
+
+        // Funktion zum Ziehbar machen eines Elements
+        function makeElementDraggable(element) {
+            let offsetX, offsetY, isDragging = false;
+            
+            element.addEventListener('mousedown', function(e) {
+                // Element auswählen
+                selectElement(element);
+                
+                // Drag-Start-Position speichern
+                const rect = element.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                isDragging = true;
+                
+                // Verhindern, dass der Text ausgewählt wird
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                // Neue Position berechnen
+                const canvasRect = designCanvas.getBoundingClientRect();
+                const x = e.clientX - canvasRect.left - offsetX;
+                const y = e.clientY - canvasRect.top - offsetY;
+                
+                // Element positionieren
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
+                element.style.transform = 'none';
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+            
+            // Klick-Event für die Auswahl
+            element.addEventListener('click', function() {
+                selectElement(element);
+            });
+        }
+
+        // Event-Listener für die Seitenauswahl
+        btnFront.addEventListener('click', function() {
+            btnFront.classList.add('active');
+            btnBack.classList.remove('active');
+            currentSide = 'front';
+            updateProductImage();
+            showElementsForCurrentSide();
+        });
+        
+        btnBack.addEventListener('click', function() {
+            btnBack.classList.add('active');
+            btnFront.classList.remove('active');
+            currentSide = 'back';
+            updateProductImage();
+            showElementsForCurrentSide();
+        });
+
+        // Event-Listener für die Produkttypauswahl
+        btnTshirt.addEventListener('click', function() {
+            btnTshirt.classList.add('active');
+            btnHoodie.classList.remove('active');
+            btnBasketball.classList.remove('active');
+            currentProductType = 'tshirt';
+            showColorsForProductType();
+            updateProductImage();
+        });
+        
+        btnHoodie.addEventListener('click', function() {
+            btnHoodie.classList.add('active');
+            btnTshirt.classList.remove('active');
+            btnBasketball.classList.remove('active');
+            currentProductType = 'hoodie';
+            showColorsForProductType();
+            updateProductImage();
+        });
+        
+        btnBasketball.addEventListener('click', function() {
+            btnBasketball.classList.add('active');
+            btnTshirt.classList.remove('active');
+            btnHoodie.classList.remove('active');
+            currentProductType = 'basketball';
+            showColorsForProductType();
+            updateProductImage();
+        });
+
+        // Event-Listener für die Farbauswahl
+        colorSwatches.forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                // Aktiven Zustand aktualisieren
+                colorSwatches.forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Farbe aktualisieren
+                currentColor = this.getAttribute('data-color');
+                updateProductImage();
+            });
+        });
+
+        // Event-Listener für Text hinzufügen
+        addTextBtn.addEventListener('click', addTextElement);
+        
+        // Event-Listener für Enter-Taste im Textfeld
+        textInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTextElement();
+            }
+        });
+
+        // Event-Listener für Bild hochladen
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                addImageElement(e.target.files[0]);
+            }
+        });
+
+        // Event-Listener für Element löschen
+        deleteElementBtn.addEventListener('click', deleteSelectedElement);
+
+        // Event-Listener für Mengenänderung
+        quantitySelect.addEventListener('change', updatePrice);
+
+        // Event-Listener für Bestellbutton
+        orderBtn.addEventListener('click', function() {
+            // Hier würde normalerweise der Bestellprozess starten
+            // Für dieses Beispiel zeigen wir nur eine Bestätigung an
+            alert('Vielen Dank für deine Bestellung! Wir werden sie so schnell wie möglich bearbeiten.');
+        });
+
+        // PayPal-Button initialisieren
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                const quantity = parseInt(quantitySelect.value);
+                let unitPrice;
+                
+                // Grundpreise je nach Produkttyp
+                if (currentProductType === 'tshirt') {
+                    unitPrice = 19.99;
+                } else if (currentProductType === 'hoodie') {
+                    unitPrice = 44.99;
+                } else if (currentProductType === 'basketball') {
+                    unitPrice = 34.99;
+                }
+                
+                // Mengenrabatt
+                if (quantity >= 100) {
+                    if (currentProductType === 'tshirt') {
+                        unitPrice = 16.99;
+                    } else if (currentProductType === 'hoodie') {
+                        unitPrice = 39.99;
+                    } else if (currentProductType === 'basketball') {
+                        unitPrice = 29.99;
+                    }
+                } else if (quantity >= 25) {
+                    if (currentProductType === 'tshirt') {
+                        unitPrice = 17.99;
+                    } else if (currentProductType === 'hoodie') {
+                        unitPrice = 41.99;
+                    } else if (currentProductType === 'basketball') {
+                        unitPrice = 31.99;
+                    }
+                } else if (quantity >= 10) {
+                    if (currentProductType === 'tshirt') {
+                        unitPrice = 18.99;
+                    } else if (currentProductType === 'hoodie') {
+                        unitPrice = 42.99;
+                    } else if (currentProductType === 'basketball') {
+                        unitPrice = 32.99;
+                    }
+                }
+                
+                const shippingCost = 5.99;
+                const totalPrice = (unitPrice * quantity) + shippingCost;
+                
+                let productName = '';
+                if (currentProductType === 'tshirt') {
+                    productName = 'T-Shirt';
+                } else if (currentProductType === 'hoodie') {
+                    productName = 'Hoodie';
+                } else if (currentProductType === 'basketball') {
+                    productName = 'Basketball Trikot';
+                }
+                
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: totalPrice.toFixed(2),
+                            currency_code: 'EUR'
+                        },
+                        description: `${quantity}x ${productName} (${getColorName(currentColor)})`
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    alert('Zahlung erfolgreich! Vielen Dank für deine Bestellung, ' + details.payer.name.given_name + '!');
+                });
+            }
+        }).render('#paypal-button-container');
+
+        // Kontaktformular absenden
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('https://formspree.io/f/xzzgjdbe', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Vielen Dank für deine Nachricht! Wir werden uns so schnell wie möglich bei dir melden.');
+                    this.reset();
+                } else {
+                    alert('Beim Senden der Nachricht ist ein Fehler aufgetreten. Bitte versuche es später noch einmal.');
+                }
+            })
+            .catch(error => {
+                alert('Beim Senden der Nachricht ist ein Fehler aufgetreten. Bitte versuche es später noch einmal.');
+            });
+        });
+
+        // Initialisierung
+        updateProductImage();
+
+        // Klick außerhalb eines Elements deselektiert das aktive Element
+        designCanvas.addEventListener('click', function(e) {
+            if (e.target === designCanvas || e.target === productImage) {
+                if (activeElement) {
+                    activeElement.classList.remove('active');
+                    activeElement = null;
+                    deleteElementBtn.disabled = true;
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95c79503b4548cb6',t:'MTc1MjA2MTU5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
